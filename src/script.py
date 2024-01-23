@@ -72,7 +72,16 @@ def reconnaitreTexteCoordonees(screenshot_path, x1,y1,x2,y2,nomCrop="test"):
   text = pytesseract.image_to_string(cropped_image)
   return text.replace("\n"," ").strip()
 
-def reconnaitreBlindes():
+def reconnaitreBlindesCashGame():
+  dicBlindes = {}
+  blindes= reconnaitreTexteCoordonees(screenshot_path,119,23,405,58,"blindes")
+  blindes = re.sub(regexBlindes, "", blindes)
+  blindes = re.sub(r'€.*', '€', blindes)
+  dicBlindes = {"Blindes" :blindes}
+  return dicBlindes
+
+
+def reconnaitreBlindesTournoi():
   dicBlindes = {}
   blindes= reconnaitreTexteCoordonees(screenshot_path,119,23,405,58,"blindes")
   blindes = re.sub(regexBlindes, "", blindes)
@@ -83,7 +92,7 @@ def reconnaitreBlindes():
 def reconnaitrePots():
   dicPots = {}
   pots= reconnaitreTexteCoordonees(screenshot_path,760,530,1009,602,"pots")
-  pots = re.sub(r'.*Po', 'Po', pots)
+  #pots = re.sub(r'.*Po', 'Po', pots)
   pots = re.sub(regex, " ", pots)
   dicPots = {"Pots" : pots}
   return dicPots
@@ -106,9 +115,9 @@ def reconnaitreMesDonnees():
 
 def reconnaitreP2():
   dicP2 = {}
-  nomP2 =  reconnaitreTexteCoordonees(screenshot_path,268,612,530,643,"nomP2")
-  miseActuelleP2 =  reconnaitreTexteCoordonees(screenshot_path,461,578,601,615,"miseActuelleP2")
-  stackP2 =  reconnaitreTexteCoordonees(screenshot_path,226,642,513,682,"stackP2")
+  nomP2 =  reconnaitreTexteCoordonees(screenshot_path,290,694,485,719,"nomP2")
+  miseActuelleP2 =  reconnaitreTexteCoordonees(screenshot_path,498,630,595,676,"miseActuelleP2")
+  stackP2 =  reconnaitreTexteCoordonees(screenshot_path,296,724,481,773,"stackP2")
   #reconnaitre cartes 
   #reconnaitre status si il n'y a aucune carte 
   
@@ -120,14 +129,8 @@ def reconnaitreP2():
   return dicP2
 
 
-
-      
-
-
-
 #screenshot(nomPage,screenshot_path)
 
-print(reconnaitreBlindes())
 print(reconnaitrePots())
 print(reconnaitreMesDonnees())
 print(reconnaitreP2())
