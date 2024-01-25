@@ -1,5 +1,5 @@
 from numpy import var
-import pygetwindow as gw
+#import pygetwindow as gw
 import pyautogui
 from matplotlib import pyplot as plt
 import cv2
@@ -9,9 +9,12 @@ import re
 import pyperclip
 import numpy as np
 import os
+from ewmh import EWMH
+from mss import mss
     
 import pytesseract
 from PIL import Image
+
 
 nomPage = "Playground"
 nomPage2="ChatGPT - Google Chrome"
@@ -35,6 +38,17 @@ baseImageFullChris = "../matching/card/full_chris"
 varImageIncr = 1
 
 #print(gw.getAllTitles())
+
+
+ewmh = EWMH()
+
+# Récupérer la liste des fenêtres actives
+active_windows = ewmh.getClientList()
+
+# Afficher les noms des fenêtres
+window_titles = [ewmh.getWmName(window) for window in active_windows]
+print(window_titles)
+
 
 
 def preprocess_image(image):
@@ -171,6 +185,36 @@ def screenshot(nomPage, screenshot_path):
         fenetre[0].minimize()
       else:
         print(f"L'onglet '{nomPage}' n'a pas été trouvé. Réessai en cours...")
+
+def screenshotLinux(nomPage, screenshot_path):
+    ewmh = EWMH()
+    
+        # Récupérer la liste des fenêtres actives
+    active_windows = ewmh.getClientList()
+
+    for window in active_windows:
+        window_name = ewmh.getWmName(window)
+        if window_name and nomPage.lower() in window_name.lower():
+            ewmh.setActiveWindow(window)
+            
+            # Mettre la fenêtre en plein écran (ou maximisée)
+            ewmh.requestState(window, 1)  # 1 corresponds à l'état "Maximized"
+            time.sleep(0.5)
+            
+            # Capturer l'écran
+            with mss() as sct:
+                screenshot = sct.shot(output=screenshot_path)
+
+            print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
+            
+            # Minimiser la fenêtre
+            ewmh.requestState(window, 2)  # 2 corresponds à l'état "Minimized"
+            break
+        else:
+          print(f"L'onglet '{nomPage}' n'a pas été trouvé. Réessai en cours...")
+
+
+
 
 
       
@@ -466,7 +510,8 @@ def remplirJSON():
   return finalRequest
 
 
-screenshot(nomPage,screenshot_path)
+#screenshot(nomPage,screenshot_path)
+screenshotLinux(nomPage,screenshot_path)
 #afficherImage("capture.png")
 #screenshot(nomPage2,screenshot_path2)
 
