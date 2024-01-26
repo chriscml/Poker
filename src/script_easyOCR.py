@@ -9,28 +9,22 @@ import re
 import pyperclip
 import numpy as np
 import os
-
-from pywinauto.application import Application
-import pyautogui
     
 import pytesseract
 from PIL import Image
 
 from pywinauto import Desktop
-
-import gc 
+import easyocr
 
 nomPage = "Playground"
 
 screenshot_path = "../assets/capture.png"
-
-
+screenshot_path2 = "../assets/capture2.png"
 screenshot_cartes_path_flop="../matching/screens/flop"
 screenshot_cartes_path_turn="../matching/screens/turn"
 screenshot_cartes_path_river="../matching/screens/river"
 screenshot_cartes_path_c="../matching/screens/c"
 screenshot_cartes_path_back="../matching/screens/back"
-
 path_base = '..//assets//'
 regex = r'[^a-zA-Z0-9,:]'
 regexBlindes =r'[^0-9,€-]'
@@ -41,6 +35,7 @@ nomPageConseilDePokerEnDirect ="Conseils de poker en direct - Google Chrome"
 baseImageBack = "../matching/card/back"
 baseImageVide = "../matching/card/vide"
 
+varImageIncr = 1
 
 #print(gw.getAllTitles())
 
@@ -181,82 +176,76 @@ def get_dominant_color(image):
         couleurDominante = ' de trefle'  # Clubs
     
     return couleurDominante
-      
-def reconnaitreBB(screenshot_path, x1, y1, x2, y2, nomCrop="test"):
+
+  
+def reconnaitreBB_easyOCR(screenshot_path, x1, y1, x2, y2, nomCrop="test"):
+    reader = easyocr.Reader(['en'])  # Choisissez la langue que vous souhaitez utiliser
+
     image = Image.open(screenshot_path)
 
     cropped_image = image.crop((x1, y1, x2, y2))
-    
+
     # Save the cropped image for debugging
     cropped_image.save(f"../assets/{nomCrop}.png")
-    
-    # Read the saved image using OpenCV
-    cropped_image_cv = cv2.imread(f"../assets/{nomCrop}.png")
-    
-    # Preprocess the image for better OCR
-    preprocessed_image = preprocess_image(cropped_image_cv)
-    
-    # Configure tesseract to recognize numbers, comma, and 'B'
-    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789,BbALL-IN'
-    text = pytesseract.image_to_string(preprocessed_image, config=custom_config)
-    
-    return text.replace("\n"," ").strip()
-  
 
-  
-def reconnaitreTxt(screenshot_path, x1, y1, x2, y2, nomCrop="pseudo"):
+    # Read the saved image using EasyOCR
+    result = reader.readtext(f"../assets/{nomCrop}.png")
+
+    # Extract and format the recognized text
+    text = ' '.join([entry[1] for entry in result])
+
+    return text
+
+
+def reconnaitreTxt_easyOCR(screenshot_path, x1, y1, x2, y2, nomCrop="pseudo"):
+    reader = easyocr.Reader(['en'])  # Choisissez la langue que vous souhaitez utiliser
+
     image = Image.open(screenshot_path)
 
     cropped_image = image.crop((x1, y1, x2, y2))
-    
+
     # Save the cropped image for debugging
     cropped_image.save(f"../assets/{nomCrop}.png")
-    
-    # Read the saved image using OpenCV
-    cropped_image_cv = cv2.imread(f"../assets/{nomCrop}.png")
-    
-    # Preprocess the image for better OCR
-    preprocessed_image = preprocess_image(cropped_image_cv)
-    
-    # Configure tesseract to recognize a broad set of characters
-    # Since usernames can be more complex, we're not using a whitelist here
-    custom_config = r'--oem 3 --psm 6'
-    text = pytesseract.image_to_string(preprocessed_image, config=custom_config)
-    
+
+    # Read the saved image using EasyOCR
+    result = reader.readtext(f"../assets/{nomCrop}.png")
+
+    # Extract and format the recognized text
+    text = ' '.join([entry[1] for entry in result])
+
     return text.replace("\n"," ").strip()
 
-
-
-def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
+def reconnaitreCartes_easyOCR(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
     nomCarte = ""
   
-    image = Image.open(screenshot_path)
+    reader = easyocr.Reader(['en'])  # Choisissez la langue que vous souhaitez utiliser
+
+    image = Image.open(screenshot_cartes_path)
     image_cropped_path = f"{screenshot_cartes_path}/{nomCrop}.png"
   
     cropped_image = image.crop((x1, y1, x2, y2))
     cropped_image.save(image_cropped_path)
-  
-    cropped_image = cv2.imread(image_cropped_path)
+    
     couleur_dominante = get_dominant_color(cropped_image)
     
     if couleur_dominante == 'pas encore de carte':
       return 'pas encore de carte'
   
-    # Preprocess the image for better OCR
-    preprocessed_image = preprocess_image(cropped_image)
-    
-    # Configure tesseract to do single character recognition
-    custom_config = r'--oem 3 --psm 10 -c tessedit_char_whitelist=0123456789AJQK10'
-    text = pytesseract.image_to_string(cropped_image, config=custom_config)
-    
+    # Read the saved image using EasyOCR
+    result = reader.readtext(image_cropped_path)
+
+    # Extract and format the recognized text
+    text = ' '.join([entry[1] for entry in result])
+
+    # Check if the recognized text is "1" and replace it with "7"
     if text.strip() == "1":
-      text = "7"
+        text = "7"
       
-    nomCarte = text.strip() + couleur_dominante
-    
-    # if text == "":
-    #   nomCarte=""
-      
+    nomCarte = text.strip() + " " + couleur_dominante  # Ajoutez la couleur dominante ici
+
+    # Votre fonction obtient la couleur dominante (couleur_dominante) d'une manière non spécifiée dans votre code. 
+    # Vous devrez ajouter cette fonctionnalité ou un appel à une fonction pour extraire la couleur dominante.
+
     return nomCarte
 
 def reconnaitreFlop():
@@ -296,64 +285,20 @@ def reconnaitreRiver():
   return river.strip()
 
 def screenshot(nomPage, screenshot_path):
-  try:
-      # Recherche de la fenêtre "Playground" par son titre
-      fenetre = gw.getWindowsWithTitle(nomPage)
-      if fenetre:
-          fenetre = fenetre[0]
-
-          # Restaure la fenêtre depuis la barre des tâches
-          fenetre.restore()
-          
-          time.sleep(0.1)
-          
-          fenetre.maximize()
-          
-          left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
-
-          # Attends un court instant pour que la fenêtre apparaisse
-          time.sleep(0.1)
-
-          # Maximise la fenêtre
-          fenetre.maximize()
-
-          # Attends un court instant pour que la fenêtre se maximise complètement
-          time.sleep(0.7)
-
-          # Prend une capture d'écran de la fenêtre maximisée
-          screenshot = pyautogui.screenshot(region=(left, top, width, height))
-          screenshot.save(screenshot_path)
-          print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
-
-          # Minimise la fenêtre
-          fenetre.minimize()
-      else:
-          print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
-
-  except Exception as e:
-      print(f"Erreur lors de la capture d'écran : {e}") 
-    
-  gc.collect()
-
-        
-def screenshotWin(nomPage, screenshot_path):
-    titre_page = ".*{}.*".format(nomPage)
-    try:
-        app = Application(backend="uia").connect(title_re=".*Playground.*", visible_only= False)
-        fenetre = app.top_window()
-        fenetre.set_focus()
-        fenetre.maximize()
+      fenetre1 = gw.getWindowsWithTitle(nomPage)
+      if len(fenetre1) > 0:
+        left, top, width, height = fenetre1[0].left, fenetre1[0].top, fenetre1[0].width, fenetre1[0].height
+        fenetre1[0].activate() 
+          # Mettre la fenêtre en plein écran (ou maximisée)
+        fenetre1[0].maximize()
+        time.sleep(0.5)
         screenshot = pyautogui.screenshot()
         screenshot.save(screenshot_path)
         print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
-        fenetre.minimize()
-        del screenshot
-        del fenetre
-        del app
-    except Exception as e:
-        print(f"Erreur lors de la capture d'écran : {e}")
-    
-    gc.collect()
+        # Minimiser la fenêtre
+        fenetre1[0].minimize()
+      else:
+        print(f"L'onglet '{nomPage}' n'a pas été trouvé. Réessai en cours...")
 
 
       
@@ -390,7 +335,7 @@ def binarize_image(image, threshold=128):
 
 def reconnaitreBlindesTournoi():
   dicBlindes = {}
-  blindes= reconnaitreTxt(screenshot_path,119,23,405,58,"blindes")
+  blindes= reconnaitreTxt_easyOCR(screenshot_path,119,23,405,58,"blindes")
   blindes = re.sub(regexBlindes, "", blindes)
   blindes = re.sub(r'€.*', '€', blindes)
   dicBlindes = {"Blindes" :blindes}
@@ -406,7 +351,7 @@ def reconnaitreBlindesTournoi():
 
 def reconnaitrePotsWindows10_6():
     dicPots = {}
-    pots = reconnaitreTxt(screenshot_path, 760, 530, 1009, 602, "pots")
+    pots = reconnaitreTxt_easyOCR(screenshot_path, 760, 530, 1009, 602, "pots")
     
     # Use regular expression to remove everything before the first occurrence of 'Pot'
     pots_cleaned = re.sub(r'^.*?Pot', 'Pot', pots)
@@ -422,11 +367,11 @@ def reconnaitreActionPossibleWindows10():
 
 def reconnaitreP2Windows10_6():
   dicP2 = {}
-  nomP2 =  reconnaitreTxt(screenshot_path,302,703,446,736,"nomP2")
-  miseActuelleP2 =  reconnaitreBB(screenshot_path,465,640,603,677,"miseActuelleP2") # a faire plus tard !!!!!!!!!!!
-  stackP2 =  reconnaitreBB(screenshot_path,296,735,296+210,735+40,"stackP2")
+  nomP2 =  reconnaitreTxt_easyOCR(screenshot_path,302,703,446,736,"nomP2")
+  miseActuelleP2 =  reconnaitreBB_easyOCR(screenshot_path,465,640,603,677,"miseActuelleP2") # a faire plus tard !!!!!!!!!!!
+  stackP2 =  reconnaitreBB_easyOCR(screenshot_path,285,735,496,794,"stackP2")
 
-  reconnaitreCartes(screenshot_cartes_path_back,345,624,345+45+75,624+45,"b2") 
+  reconnaitreCartes_easyOCR(screenshot_cartes_path_back,302,622,302+45+75,622+45,"b2") 
   b2 = matchingBack(f"{screenshot_cartes_path_back}/b2.png")
    
   if b2=="couché":
@@ -446,11 +391,11 @@ def reconnaitreP2Windows10_6():
 
 def reconnaitreP3Windows10_6():
   dicP3 = {}
-  nomP3 =  reconnaitreTxt(screenshot_path,289,254,455,289,"nomP3")
-  miseActuelleP3 =  reconnaitreBB(screenshot_path,443,359,603,395,"miseActuelleP3")
-  stackP3 =  reconnaitreBB(screenshot_path,273,284,476,335,"stackP3")
+  nomP3 =  reconnaitreTxt_easyOCR(screenshot_path,289,254,455,289,"nomP3")
+  miseActuelleP3 =  reconnaitreBB_easyOCR(screenshot_path,443,359,603,395,"miseActuelleP3")
+  stackP3 =  reconnaitreBB_easyOCR(screenshot_path,273,284,476,335,"stackP3")
   
-  reconnaitreCartes(screenshot_cartes_path_back,303,171,302+45+75,171+45,"b3") 
+  reconnaitreCartes_easyOCR(screenshot_cartes_path_back,303,171,302+45+75,171+45,"b3") 
   b3 = matchingBack(f"{screenshot_cartes_path_back}/b3.png")
    
   if b3=="couché":
@@ -469,11 +414,11 @@ def reconnaitreP3Windows10_6():
 
 def reconnaitreP4Windows10_6():
   dicP4 = {}
-  nomP4 =  reconnaitreTxt(screenshot_path,739,178,947,212,"nomP4")
-  miseActuelleP4 =  reconnaitreBB(screenshot_path,760,333,940,368,"miseActuelleP4") # a faire plus tard !!!!!!!!!!!
-  stackP4 =  reconnaitreBB(screenshot_path,737,210,984,263,"stackP4") 
+  nomP4 =  reconnaitreTxt_easyOCR(screenshot_path,739,178,947,212,"nomP4")
+  miseActuelleP4 =  reconnaitreBB_easyOCR(screenshot_path,760,333,940,368,"miseActuelleP4") # a faire plus tard !!!!!!!!!!!
+  stackP4 =  reconnaitreBB_easyOCR(screenshot_path,737,210,984,263,"stackP4") 
   
-  reconnaitreCartes(screenshot_cartes_path_back,768,96,768+45+75,96+45,"b4") 
+  reconnaitreCartes_easyOCR(screenshot_cartes_path_back,768,96,768+45+75,96+45,"b4") 
   b4 = matchingBack(f"{screenshot_cartes_path_back}/b4.png")
    
   if b4=="couché":
@@ -492,11 +437,11 @@ def reconnaitreP4Windows10_6():
 
 def reconnaitreP5Windows10_6():
   dicP5 = {}
-  nomP5 =  reconnaitreTxt(screenshot_path,1203,256,1417,292,"nomP5")
-  miseActuelleP5 =  reconnaitreBB(screenshot_path,1071,360,1230,400,"miseActuelleP5") # a faire plus tard !!!!!!!!!!!
-  stackP5 =  reconnaitreBB(screenshot_path,1207,285,1404,340,"stackP5") 
+  nomP5 =  reconnaitreTxt_easyOCR(screenshot_path,1203,256,1417,292,"nomP5")
+  miseActuelleP5 =  reconnaitreBB_easyOCR(screenshot_path,1071,360,1230,400,"miseActuelleP5") # a faire plus tard !!!!!!!!!!!
+  stackP5 =  reconnaitreBB_easyOCR(screenshot_path,1207,285,1404,340,"stackP5") 
   
-  reconnaitreCartes(screenshot_cartes_path_back,1231,172,1231+45+75,172+45,"b5") 
+  reconnaitreCartes_easyOCR(screenshot_cartes_path_back,1231,172,1231+45+75,172+45,"b5") 
   b5 = matchingBack(f"{screenshot_cartes_path_back}/b5.png")
    
   if b5=="couché":
@@ -515,11 +460,11 @@ def reconnaitreP5Windows10_6():
 
 def reconnaitreP6Windows10_6():
   dicP6 = {}
-  nomP6 =  reconnaitreTxt(screenshot_path,1198,703,1410,733,"nomP6")
-  miseActuelleP6 =  reconnaitreBB(screenshot_path,1211,735,1420,792,"miseActuelleP6") # a faire plus tard !!!!!!!!!!!
-  stackP6 =  reconnaitreBB(screenshot_path,1211,735,1420,792,"stackP6") 
+  nomP6 =  reconnaitreTxt_easyOCR(screenshot_path,1198,703,1410,733,"nomP6")
+  miseActuelleP6 =  reconnaitreBB_easyOCR(screenshot_path,1211,735,1420,792,"miseActuelleP6") # a faire plus tard !!!!!!!!!!!
+  stackP6 =  reconnaitreBB_easyOCR(screenshot_path,1211,735,1420,792,"stackP6") 
   
-  reconnaitreCartes(screenshot_cartes_path_back,1231,621,1231+45+75,621+45,"b6") 
+  reconnaitreCartes_easyOCR(screenshot_cartes_path_back,1231,621,1231+45+75,621+45,"b6") 
   b6 = matchingBack(f"{screenshot_cartes_path_back}/b6.png")
   
   if b6=="couché":
@@ -539,12 +484,12 @@ def reconnaitreMesDonneesWindows10_6():
   p1c1 =""
   p1c2 =""
   dicP1 = {}
-  nomP1 =  reconnaitreTxt(screenshot_path,757,778,931,807,"nomP1")
-  miseActuelleP1 =  reconnaitreBB(screenshot_path,763,660,949,695,"miseActuelleP1")
-  stackP1 =  reconnaitreBB(screenshot_path,724,808,970,863,"stackP1")
+  nomP1 =  reconnaitreTxt_easyOCR(screenshot_path,757,778,931,807,"nomP1")
+  miseActuelleP1 =  reconnaitreBB_easyOCR(screenshot_path,763,660,949,695,"miseActuelleP1")
+  stackP1 =  reconnaitreBB_easyOCR(screenshot_path,724,808,970,863,"stackP1")
   
-  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,771,698,771+38,696+43,"p1c1")  
-  p1c2 = reconnaitreCartes(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
+  p1c1 = reconnaitreCartes_easyOCR(screenshot_cartes_path_c,771,698,771+38,696+43,"p1c1")  
+  p1c2 = reconnaitreCartes_easyOCR(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
   #reconnaitre status si il n'y a aucune carte 
   
   nomP1 =  re.sub(regex, "", nomP1)
@@ -558,9 +503,9 @@ def reconnaitreMesDonneesWindows10_6():
 
 def reconnaitreActionsPossible():
   actionPossible = [] 
-  actionPossible.append(reconnaitreTxt(screenshot_path,440,970,440+200,970+60,"fold"))
-  actionPossible.append(reconnaitreTxt(screenshot_path,709,970,709+200,970+60,"call"))
-  actionPossible.append(reconnaitreTxt(screenshot_path,977,970,977+200,970+60,"raise"))
+  actionPossible.append(reconnaitreTxt_easyOCR(screenshot_path,440,970,440+200,970+60,"fold"))
+  actionPossible.append(reconnaitreTxt_easyOCR(screenshot_path,709,970,709+200,970+60,"call"))
+  actionPossible.append(reconnaitreTxt_easyOCR(screenshot_path,977,970,977+200,970+60,"raise"))
   
   return actionPossible
 
@@ -576,15 +521,15 @@ def remplirJSON():
   p1 = reconnaitreMesDonneesWindows10_6()
   print(p1)
   p2 = reconnaitreP2Windows10_6()
-  print(p2)
+  #print(p2)
   p3 = reconnaitreP3Windows10_6()
-  print(p3)
+  #print(p3)
   p4 = reconnaitreP4Windows10_6()
-  print(p4)
+  #print(p4)
   p5 = reconnaitreP5Windows10_6()
-  print(p5)
+  #print(p5)
   p6 = reconnaitreP6Windows10_6()
-  print(p6)
+  #print(p6)
   flop = reconnaitreFlop()
   print(flop)
   turn = reconnaitreTurn()
@@ -654,53 +599,39 @@ def remplirJSON():
   print(finalRequest)
   return finalRequest
 
-def envoyerAGPT(nomPage):
+def envoyerAGPT(hwnd):
+  
+  
     questionGPT = remplirJSON()
     
     try:
-      fenetreGPT = gw.getWindowsWithTitle(nomPage)
-      if fenetreGPT:
-        fenetreGPT = fenetreGPT[0]
-        fenetreGPT.restore()
-        #fenetreGPT.activate()
-        time.sleep(0.5)
-        
-        fenetreGPT.maximize()
-        time.sleep(0.7)
-        pyperclip.copy(str(questionGPT))
-        pyautogui.click(x=1400, y=941)  # Coordonnées du champ d'entrée
-        pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
-        pyautogui.press('enter')  # Appuyer sur la touche Entrée
-        del fenetreGPT
-    except Exception as e:
-        print(f"Erreur lors de l'activation de la fenêtre: {e}")
-        return
-
-    
-   
-    gc.collect()
-    #fenetre[0].minimize()
-
-def envoyerAGPTWin(nomPage):
-    questionGPT = remplirJSON()
-    titre_page = r".*{}.*".format(nomPage)
-    try:
-        # Se connecter à la fenêtre par son titre
-        app = Application(backend="uia").connect(title_re=titre_page)
-        fenetre = app.window(title_re=titre_page)
-        fenetre.set_focus()
+        fenetre = gw.Win32Window(hwnd)
+        fenetre.activate()
         time.sleep(0.5)
         fenetre.maximize()
         time.sleep(0.2)
     except Exception as e:
         print(f"Erreur lors de l'activation de la fenêtre: {e}")
+    
+    try:
+      fenetre1 = gw.getWindowsWithTitle(nomPageConseilDePokerEnDirect)
+      if len(fenetre1) > 0:
+        left, top, width, height = fenetre1[0].left, fenetre1[0].top, fenetre1[0].width, fenetre1[0].height
+        fenetre1[0].activate() 
+          # Mettre la fenêtre en plein écran (ou maximisée)
+        fenetre1[0].maximize()
+    except Exception as e:
+        print(f"Erreur lors de l'activation de la fenêtre: {e}")
         return
 
+    
     pyperclip.copy(str(questionGPT))
     pyautogui.click(x=898, y=941)  # Coordonnées du champ d'entrée
     pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
     pyautogui.press('enter')  # Appuyer sur la touche Entrée
     
+    #fenetre[0].minimize()
+
 
 #screenshot(nomPage,screenshot_path)
 #afficherImage("capture.png")
@@ -725,12 +656,7 @@ def test():
 
     
 screenshot(nomPage,screenshot_path) 
-afficherImage(screenshot_path)
-#envoyerAGPT(nomPageConseilDePokerEnDirect)
-
-
-#screenshotWin(nomPage,screenshot_path)
-#envoyerAGPTWin(nomPageConseilDePokerEnDirect)
+envoyerAGPT(hwnd)
 
 
 #test()
