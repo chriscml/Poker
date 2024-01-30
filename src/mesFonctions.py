@@ -3,7 +3,7 @@ import pygetwindow as gw
 import pyautogui
 from matplotlib import pyplot as plt
 import cv2
-from openai import OpenAI
+import openai 
 import time
 import re
 import pyperclip
@@ -159,7 +159,7 @@ def matchingVide(carte_path, largeur_base=200, hauteur_base=500, method=cv2.TM_C
             meilleure_correspondance = image_nom
             meilleure_score = score
 
-    nom_carte = 'pas de carte' if meilleure_correspondance else "une carte"
+    nom_carte = 'no card' if meilleure_correspondance else "a card"
     #print("La carte capturée est :", nom_carte)
     return nom_carte
 
@@ -190,15 +190,15 @@ def get_dominant_color(image, k=4):
 
     # Define color ranges
     if np.all(dominant_color < [50, 50, 50]):  # Black if all values are low
-        return ' de pique '  # Spades
+        return ' of spades '  # Spades
     elif dominant_color[0] > dominant_color[1] and dominant_color[0] > dominant_color[2]:  # Red dominant
-        return ' de coeur '  # Hearts
+        return ' of hearts'  # Hearts
     elif dominant_color[2] > dominant_color[0] and dominant_color[2] > dominant_color[1]:  # Blue dominant
-        return ' de carreaux'  # Diamonds
+        return ' of diamonds'  # Diamonds
     elif dominant_color[1] > dominant_color[0] and dominant_color[1] > dominant_color[2]:  # Green dominant
-        return ' de trefle'  # Clubs
+        return ' of clover'  # Clubs
     else:
-        return "pas encore de carte"
+        return "no card"
       
 def reconnaitreBB(screenshot_path, x1, y1, x2, y2, nomCrop="test"):
     image = Image.open(screenshot_path)
@@ -257,8 +257,8 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
     cropped_image = cv2.imread(image_cropped_path)
     couleur_dominante = get_dominant_color(cropped_image)
     
-    if couleur_dominante == 'pas encore de carte':
-      return 'pas encore de carte'
+    if couleur_dominante == 'no card':
+      return 'no card'
   
     # Preprocess the image for better OCR
     preprocessed_image = preprocess_image(cropped_image)
@@ -270,34 +270,45 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
     if text.strip() == "1" or text.strip() == "11":
       text = "7"
       
-    for caractere in text:
-        if caractere.isalpha() or caractere.isdigit():
-            text = caractere
-            break
+    if text.strip()!="10":
+      for caractere in text:
+          if caractere.isalpha() or caractere.isdigit():
+              text = caractere
+              break 
+          
+    if text == "K":
+       nomCarte="King"
+    if text == "Q":
+       nomCarte="Queen"
+    if text == "J":
+       nomCarte="Jack"
+    if text == "A":
+       nomCarte="ACE"
     
   
     nomCarte = text.strip() + couleur_dominante
     
     if text == "":
-       nomCarte="pas de carte"
+       nomCarte="no card"
+    
       
     return nomCarte
 
 def reconnaitreFlop():
   flop=[]
-  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,368,566+99,368+45,"f1")
+  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,358,566+99,368+45,"f1")
   f1 = matchingVide(f"{screenshot_cartes_path_flop}/f1.png")
-  if f1 == "pas de carte":
+  if f1 == "no card":
     flop1 = f1
   
-  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,368,678+99,368+45,"f2")
+  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,358,678+99,368+45,"f2")
   f2 = matchingVide(f"{screenshot_cartes_path_flop}/f2.png")
-  if f2 == "pas de carte":
+  if f2 == "no card":
     flop2 = f2
   
-  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,368,790+99,368+45,"f3")
+  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,358,790+99,368+45,"f3")
   f3 = matchingVide(f"{screenshot_cartes_path_flop}/f3.png")
-  if f3 == "pas de carte":
+  if f3 == "no card":
     flop3 = f3
     
   flop.append(flop1)
@@ -306,16 +317,16 @@ def reconnaitreFlop():
   return flop
 
 def reconnaitreTurn():
-  turn = reconnaitreCartes(screenshot_cartes_path_turn,898,368,898+101,368+45,"t")
+  turn = reconnaitreCartes(screenshot_cartes_path_turn,898,358,898+101,368+45,"t")
   t = matchingVide(f"{screenshot_cartes_path_turn}/t.png")
-  if t == "pas de carte":
+  if t == "no card":
     turn = t
   return turn.strip()
 
 def reconnaitreRiver():
-  river = reconnaitreCartes(screenshot_cartes_path_river,1010,368,1010+101,368+45,"r")
+  river = reconnaitreCartes(screenshot_cartes_path_river,1010,358,1010+101,368+45,"r")
   r = matchingVide(f"{screenshot_cartes_path_river}/r.png")
-  if r == "pas de carte":
+  if r == "no card":
     river = r
   return river.strip()
 
@@ -360,7 +371,7 @@ def screenshot(nomPage, screenshot_path):
           screenshot.save(screenshot_path)
           print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
           # Minimise la fenêtre
-          fenetre.minimize()
+          #fenetre.minimize()
       else:
           print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
 
@@ -577,7 +588,7 @@ def reconnaitreMesDonneesWindows10_6():
   miseActuelleP1 =  reconnaitreBB(screenshot_path,763,660,949,695,"miseActuelleP1")
   stackP1 =  reconnaitreBB(screenshot_path,724,808,970,863,"stackP1")
   
-  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,694,771+48,696+45,"p1c1")  
+  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,694,761+55,696+45,"p1c1")  
   p1c2 = reconnaitreCartes(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
   #reconnaitre status si il n'y a aucune carte 
   
@@ -621,64 +632,124 @@ def reconnaitreActionsPossible():
 
 def remplirJSON():
     pots, p1, p2, p3, p4, p5, p6 = parallel_recognize_players_data()
+    print(f""" Joueurs:
+        - My Name: {p1["Nom"]}
+            Ma bankroll: {p1["Stack"]}
+            My Cards: {p1["Cartes"]}
+            My State: {p1["Statut"]}
+
+        - name player2: {p2["Nom"]}
+            bankroll: {p2["Stack"]}
+            actual bet: {p2["MiseActuelle"]}
+            State: {p2["Statut"]}
+
+        - name player3: {p3["Nom"]}
+            bankroll: {p3["Stack"]}
+            actual bet: {p3["MiseActuelle"]}
+            State: {p3["Statut"]}
+
+        - name player4: {p4["Nom"]}
+            bankroll: {p4["Stack"]}
+            actual bet: {p4["MiseActuelle"]}
+            State: {p4["Statut"]}
+
+        - name player5: {p5["Nom"]}
+            bankroll: {p5["Stack"]}
+            actual bet: {p5["MiseActuelle"]}
+            State: {p5["Statut"]}
+            
+        - name player6: {p6["Nom"]}
+            bankroll: {p6["Stack"]}
+            actual bet: {p6["MiseActuelle"]}
+            State: {p6["Statut"]}""")
   
     flop, turn, river = recognize_all_board_cards() 
+    print(f"""Pot: {pots["Pots"]}
+        Community Cards: flop: {flop} turn: {turn} river: {river}""")
 
     actionsPossible = reconnaitreActionsPossible()
+    print(f"""Moves I can do: {actionsPossible}
+        Money I can bet: 2.225BB, 2.5BB, 2.75BB, 3BB, 3.5BB, 4BB""")
     
     finalRequest = f"""
         Joueurs:
-        - Mon Nom: {p1["Nom"]}
-            Ma bankroll: {p1["Stack"]}
-            Mes Cartes: {p1["Cartes"]}
-            Ma Mise Actuelle: {p1["MiseActuelle"]}
-            Mon Statut: {p1["Statut"]}
+        - My Name: {p1["Nom"]}
+            My bankroll: {p1["Stack"]}
+            My Cards: {p1["Cartes"]}
+            My State: {p1["Statut"]}
 
-        - Nom: {p2["Nom"]}
+        - name player2: {p2["Nom"]}
             bankroll: {p2["Stack"]}
-            Mise Actuelle: {p2["MiseActuelle"]}
-            Statut: {p2["Statut"]}
+            actual bet: {p2["MiseActuelle"]}
+            State: {p2["Statut"]}
 
-        - Nom: {p3["Nom"]}
+        - name player3: {p3["Nom"]}
             bankroll: {p3["Stack"]}
-            Mise Actuelle: {p3["MiseActuelle"]}
-            Statut: {p3["Statut"]}
+            actual bet: {p3["MiseActuelle"]}
+            State: {p3["Statut"]}
 
-        - Nom: {p4["Nom"]}
+        - name player4: {p4["Nom"]}
             bankroll: {p4["Stack"]}
-            Mise Actuelle: {p4["MiseActuelle"]}
-            Statut: {p4["Statut"]}
+            actual bet: {p4["MiseActuelle"]}
+            State: {p4["Statut"]}
 
-        - Nom: {p5["Nom"]}
+        - name player5: {p5["Nom"]}
             bankroll: {p5["Stack"]}
-            Mise Actuelle: {p5["MiseActuelle"]}
-            Statut: {p5["Statut"]}
+            actual bet: {p5["MiseActuelle"]}
+            State: {p5["Statut"]}
             
-        - Nom: {p6["Nom"]}
+        - name player6: {p6["Nom"]}
             bankroll: {p6["Stack"]}
-            Mise Actuelle: {p6["MiseActuelle"]}
-            Statut: {p6["Statut"]}
+            actual bet: {p6["MiseActuelle"]}
+            State: {p6["Statut"]}
 
         Pot: {pots["Pots"]}
-        Cartes Communes: flop: {flop} turn: {turn} river: {river}
-        Mes Actions possibles: {actionsPossible}
-        Mes mises possibles: 2.225BB, 2.5BB, 2.75BB, 3BB, 3.5BB, x4BB
+        Community Cards: flop: {flop} turn: {turn} river: {river}
+        Moves I can do: {actionsPossible}
+        Money I can bet: 2.225BB, 2.5BB, 2.75BB, 3BB, 3.5BB, 4BB
     """ 
-    print(finalRequest)
+    
     return finalRequest
   
   
 def remplirJSONsimplifie():
     pots, p1, p2, p3, p4, p5, p6 = parallel_recognize_players_data()
+    print(f""" Joueurs:
+            Mon Stack: {p1["Stack"]}
+            Mes Cartes: {p1["Cartes"]}
+            Ma Mise Actuelle: {p1["MiseActuelle"]}
+            Mon Statut: {p1["Statut"]}
 
+        - Nom: {p2["Nom"]}
+            Stack: {p2["Stack"]}
+            Statut: {p2["Statut"]}
+
+        - Nom: {p3["Nom"]}
+            Stack: {p3["Stack"]}
+            Statut: {p3["Statut"]}
+
+        - Nom: {p4["Nom"]}
+            Stack: {p4["Stack"]}
+            Statut: {p4["Statut"]}
+
+        - Nom: {p5["Nom"]}
+            Stack: {p5["Stack"]}
+            Statut: {p5["Statut"]}
+            
+        - Nom: {p6["Nom"]}
+            Stack: {p6["Stack"]}
+            Statut: {p6["Statut"]}""")
   
     flop, turn, river = recognize_all_board_cards() 
+    print(f"""Pot: {pots["Pots"]}
+        Cartes Communes: {flop} {turn} {river}""")
 
     actionsPossible = reconnaitreActionsPossible()
-
+    print(f"""\nactions possible : {actionsPossible}""")
+    
     finalRequest = f"""
-        Joueurs:
-            Mon Stack: {p1["Stack"]}
+        Players:
+            My bankroll: {p1["Stack"]}
             Mes Cartes: {p1["Cartes"]}
             Ma Mise Actuelle: {p1["MiseActuelle"]}
             Mon Statut: {p1["Statut"]}
@@ -707,8 +778,22 @@ def remplirJSONsimplifie():
         Cartes Communes: {flop} {turn} {river}
         actions possible : {actionsPossible}
     """ 
-    print(finalRequest)
     return finalRequest
+  
+def api_GPT():
+    questionGPT = remplirJSON()
+    
+    client = openai.OpenAI(api_key="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")
+
+    completion = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a proffesional poker player, skilled in analyzing and calculating the perfect move to make every time it's your turn."},
+        {"role": "user", "content": "Give me the move to do in BOLD and a small explanation for this poker configuration : " + questionGPT}
+    ]
+    )
+
+    return questionGPT, completion.choices[0].message.content
 
 def envoyerAGPT(nomPage):
     questionGPT = remplirJSON()

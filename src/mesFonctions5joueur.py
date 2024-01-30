@@ -3,7 +3,7 @@ import pygetwindow as gw
 import pyautogui
 from matplotlib import pyplot as plt
 import cv2
-from openai import OpenAI
+import openai 
 import time
 import re
 import pyperclip
@@ -277,17 +277,17 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
 
 def reconnaitreFlop():
   flop=[]
-  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,368,566+99,368+45,"f1")
+  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,358,566+99,368+45,"f1")
   f1 = matchingVide(f"{screenshot_cartes_path_flop}/f1.png")
   if f1 == "pas de carte":
     flop1 = f1
   
-  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,368,678+99,368+45,"f2")
+  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,358,678+99,368+45,"f2")
   f2 = matchingVide(f"{screenshot_cartes_path_flop}/f2.png")
   if f2 == "pas de carte":
     flop2 = f2
   
-  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,368,790+99,368+45,"f3")
+  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,358,790+99,368+45,"f3")
   f3 = matchingVide(f"{screenshot_cartes_path_flop}/f3.png")
   if f3 == "pas de carte":
     flop3 = f3
@@ -298,14 +298,14 @@ def reconnaitreFlop():
   return flop
 
 def reconnaitreTurn():
-  turn = reconnaitreCartes(screenshot_cartes_path_turn,898,368,898+101,368+45,"t")
+  turn = reconnaitreCartes(screenshot_cartes_path_turn,898,358,898+101,368+45,"t")
   t = matchingVide(f"{screenshot_cartes_path_turn}/t.png")
   if t == "pas de carte":
     turn = t
   return turn.strip()
 
 def reconnaitreRiver():
-  river = reconnaitreCartes(screenshot_cartes_path_river,1010,368,1010+101,368+45,"r")
+  river = reconnaitreCartes(screenshot_cartes_path_river,1010,358,1010+101,368+45,"r")
   r = matchingVide(f"{screenshot_cartes_path_river}/r.png")
   if r == "pas de carte":
     river = r
@@ -329,7 +329,6 @@ def minimiserVSCode(nomPage):
   if fenetre:
       fenetre = fenetre[0]
       fenetre.restore()
-      time.sleep(0.2)
       fenetre.minimize()
   else:
       print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
@@ -344,18 +343,13 @@ def screenshot(nomPage, screenshot_path):
       fenetre = gw.getWindowsWithTitle(nomPage)
       if fenetre:
           fenetre = fenetre[0]
-
-          # Restaure la fenêtre depuis la barre des tâches
-          fenetre.restore()
-          
-          time.sleep(0.2)
           
           fenetre.maximize()
           
           #left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
 
           # Attends un court instant pour que la fenêtre apparaisse
-          time.sleep(0.2)
+          #time.sleep(0.2)
 
           # Prend une capture d'écran de la fenêtre maximisée
           screenshot = pyautogui.screenshot() #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
@@ -363,7 +357,7 @@ def screenshot(nomPage, screenshot_path):
           print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
 
           # Minimise la fenêtre
-          fenetre.minimize()
+          # fenetre.minimize()
       else:
           print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
 
@@ -558,7 +552,7 @@ def reconnaitreMesDonneesWindows10_6():
   miseActuelleP1 =  reconnaitreBB(screenshot_path,763,660,949,695,"miseActuelleP1")
   stackP1 =  reconnaitreBB(screenshot_path,724,808,970,863,"stackP1")
   
-  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,698,771+45,696+43,"p1c1")  
+  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,698,761+55,696+43,"p1c1")  
   p1c2 = reconnaitreCartes(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
   #reconnaitre status si il n'y a aucune carte 
   
@@ -569,6 +563,7 @@ def reconnaitreMesDonneesWindows10_6():
   
   dicP1 = {"Nom" : nomP1, "Stack": stackP1, "Cartes":[p1c1,p1c2], "MiseActuelle": miseActuelleP1, "Statut": "En jeu"}
   return dicP1
+
 
 def parallel_recognize_players_data():
     with ThreadPoolExecutor(max_workers=7) as executor:
@@ -598,27 +593,12 @@ def reconnaitreActionsPossible():
   
   return actionPossible
 
-def remplirJSON():
-    pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
-    print(str(pots) + "\n")
-    print(str(p1) + "\n")
-    print(str(p2))
-    print(str(p3))
-    print(str(p4))
-    print(str(p5)+ "\n")
-  
-    flop, turn, river = recognize_all_board_cards() 
 
-    print("flop : "+ str(flop))
-    print("turn : "+ turn)
-    print("riverr :"+ river + "\n")
   
-    actionsPossible = reconnaitreActionsPossible()
-    print(actionsPossible)
   
-    finalRequest = f"""
-        Joueurs:
-        - Mon Nom: {p1["Nom"]}
+def remplirJSONsimplifie():
+    pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
+    print(f""" Joueurs:
             Mon Stack: {p1["Stack"]}
             Mes Cartes: {p1["Cartes"]}
             Ma Mise Actuelle: {p1["MiseActuelle"]}
@@ -626,61 +606,115 @@ def remplirJSON():
 
         - Nom: {p2["Nom"]}
             Stack: {p2["Stack"]}
-            Cartes: {p2["Cartes"]}
-            Mise Actuelle: {p2["MiseActuelle"]}
             Statut: {p2["Statut"]}
 
         - Nom: {p3["Nom"]}
             Stack: {p3["Stack"]}
-            Cartes: {p3["Cartes"]}
-            Mise Actuelle: {p3["MiseActuelle"]}
             Statut: {p3["Statut"]}
 
         - Nom: {p4["Nom"]}
             Stack: {p4["Stack"]}
-            Cartes: {p4["Cartes"]}
-            Mise Actuelle: {p4["MiseActuelle"]}
             Statut: {p4["Statut"]}
 
         - Nom: {p5["Nom"]}
             Stack: {p5["Stack"]}
-            Cartes: {p5["Cartes"]}
-            Mise Actuelle: {p5["MiseActuelle"]}
+            Statut: {p5["Statut"]}""")
+  
+    flop, turn, river = recognize_all_board_cards() 
+    print(f"""Pot: {pots["Pots"]}
+        Cartes Communes: {flop} {turn} {river}""")
+
+    actionsPossible = reconnaitreActionsPossible()
+    print(f"""\nactions possible : {actionsPossible}""")
+    
+    finalRequest = f"""
+        Players:
+            My bankroll: {p1["Stack"]}
+            Mes Cartes: {p1["Cartes"]}
+            Ma Mise Actuelle: {p1["MiseActuelle"]}
+            Mon Statut: {p1["Statut"]}
+
+        - Nom: {p2["Nom"]}
+            Stack: {p2["Stack"]}
+            Statut: {p2["Statut"]}
+
+        - Nom: {p3["Nom"]}
+            Stack: {p3["Stack"]}
+            Statut: {p3["Statut"]}
+
+        - Nom: {p4["Nom"]}
+            Stack: {p4["Stack"]}
+            Statut: {p4["Statut"]}
+
+        - Nom: {p5["Nom"]}
+            Stack: {p5["Stack"]}
             Statut: {p5["Statut"]}
-
         Pot: {pots["Pots"]}
-        Prochain Joueur: MOI
-        Cartes Communes: flop: {flop} turn: {turn} river: {river}
-        Mes Actions possibles: {actionsPossible}
-        Mes mises possibles: x2.225, x2.5, x2.75, x3, x3.5, x4
+        Cartes Communes: {flop} {turn} {river}
+        actions possible : {actionsPossible}
     """ 
-
     return finalRequest
+  
 
 
 def envoyerAGPT(nomPage):
     questionGPT = remplirJSON()
-    
+    #questionGPT = remplirJSONsimplifie()
+    pyperclip.copy(str(questionGPT))
     try:
       fenetreGPT = gw.getWindowsWithTitle(nomPage)
       if fenetreGPT:
         fenetreGPT = fenetreGPT[0]
-        
-        pyautogui.click(x=1200, y=981) #-40  # Coordonnées du champ d'entrée
+        pyautogui.click(x=1200, y=950) #-40  # Coordonnées du champ d'entrée
         time.sleep(0.1)
         pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
         time.sleep(0.1)
         pyautogui.press('enter')  # Appuyer sur la touche Entrée
         del fenetreGPT
-        del fenetreGPT
     except Exception as e:
         print(f"Erreur lors de l'activation de la fenêtre: {e}")
         return
+    gc.collect()
+    #fenetre[0].minimize()
+    
+# # def envoyerABard(nomPage,screenshot):
+    
+# #     image = Image.open(screenshot_path)
+# #     # Copier l'image dans le presse-papiers
+# #     output = BytesIO()
+# #     image.save(output, format='BMP')
+# #     data = output.getvalue()[14:]  # Le format BMP contient un en-tête de 14 octets qu'il faut supprimer
+# #     output.close()
+
+# #     win32clipboard.OpenClipboard()  # Ouvrir le presse-papiers
+# #     win32clipboard.EmptyClipboard()  # Vider le presse-papiers
+# #     win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)  # Copier l'image
+# #     win32clipboard.CloseClipboard()  # Fermer le presse-papiers
+#     try:
+#       fenetreGPT = gw.getWindowsWithTitle(nomPage)
+#       if fenetreGPT:
+#         fenetreGPT = fenetreGPT[0]
+#         pyautogui.click(x=1100, y=950) #-40  # Coordonnées du champ d'entrée
+#         time.sleep(0.1)
+#         pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
+#         time.sleep(2)
+#         requete = "Donne moi la meilleure action a jouer dans ce cas de figure"
+#         pyperclip.copy(str(requete))
+#         time.sleep(0.1)
+#         pyautogui.click(x=1100, y=875) #-40  # Coordonnées du champ d'entrée
+#         time.sleep(0.1)
+#         pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
+#         time.sleep(0.1)
+#         pyautogui.press('enter')  # Appuyer sur la touche Entrée
+#         del fenetreGPT
+#     except Exception as e:
+#         print(f"Erreur lors de l'activation de la fenêtre: {e}")
+#         return
 
     
    
-    gc.collect()
-    #fenetre[0].minimize()
+#     gc.collect()
+#     #fenetre[0].minimize()
 
 #screenshot(nomPage,screenshot_path)
 #afficherImage("capture.png")
@@ -688,20 +722,22 @@ def envoyerAGPT(nomPage):
 
 def test():
   pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
-  print(str(pots) + "\n")
-  print(str(p1) + "\n")
-  print(str(p2))
-  print(str(p3))
-  print(str(p4))
-  print(str(p5)+ "\n")
+  print(pots)
+  print(p1)
+  print(p2)
+  print(p3)
+  print(p4)
+  print(p5)
   
   flop, turn, river = recognize_all_board_cards() 
+  print(flop)
+  print(turn)
+  print(river)
 
   print("flop : "+ str(flop))
   print("turn : "+ turn)
-  print("riverr :"+ river + "\n")
+  print("river :"+ river)
   
-  actionsPossible = reconnaitreActionsPossible()
-  print(actionsPossible)
+  print(reconnaitreActionsPossible())
   afficherImage(screenshot_path)
 
