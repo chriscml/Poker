@@ -595,87 +595,95 @@ def reconnaitreActionsPossible():
 
 
   
-  
-def remplirJSONsimplifie():
-    pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
-    print(f""" Joueurs:
-            Mon Stack: {p1["Stack"]}
-            Mes Cartes: {p1["Cartes"]}
-            Ma Mise Actuelle: {p1["MiseActuelle"]}
-            Mon Statut: {p1["Statut"]}
+def remplirJSON5joueursW11():
+        # Redirigez les sorties print vers la zone de texte
+        pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
 
-        - Nom: {p2["Nom"]}
-            Stack: {p2["Stack"]}
-            Statut: {p2["Statut"]}
+        # Effectuez les opérations nécessaires dans remplirJSON()
+        print(f""" Joueurs:
+            - My Name: {p1["Nom"]}
+                Ma bankroll: {p1["Stack"]}
+                My Cards: {p1["Cartes"]}
+                My State: {p1["Statut"]}
+            - name player2: {p2["Nom"]}
+                bankroll: {p2["Stack"]}
+                actual bet: {p2["MiseActuelle"]}
+                State: {p2["Statut"]}
+            - name player3: {p3["Nom"]}
+                bankroll: {p3["Stack"]}
+                actual bet: {p3["MiseActuelle"]}
+                State: {p3["Statut"]}
+            - name player4: {p4["Nom"]}
+                bankroll: {p4["Stack"]}
+                actual bet: {p4["MiseActuelle"]}
+                State: {p4["Statut"]}
+            - name player5: {p5["Nom"]}
+                bankroll: {p5["Stack"]}
+                actual bet: {p5["MiseActuelle"]}
+                State: {p5["Statut"]}""") 
+        flop, turn, river = recognize_all_board_cards()
+        
+        print(f"""Pot: {pots["Pots"]}
+            Community Cards: flop: {flop} turn: {turn} river: {river}""")
+        
+        actionsPossible = reconnaitreActionsPossible()
+        print(f"""Moves I can do: {actionsPossible}
+            Money I can bet: 2.225BB, 2.5BB, 2.75BB, 3BB, 3.5BB, 4BB""")
 
-        - Nom: {p3["Nom"]}
-            Stack: {p3["Stack"]}
-            Statut: {p3["Statut"]}
+        finalRequest = f"""
+            Joueurs:
+            - My Name: {p1["Nom"]}
+                My bankroll: {p1["Stack"]}
+                My Cards: {p1["Cartes"]}
+                My State: {p1["Statut"]}
 
-        - Nom: {p4["Nom"]}
-            Stack: {p4["Stack"]}
-            Statut: {p4["Statut"]}
+            - name player2: {p2["Nom"]}
+                bankroll: {p2["Stack"]}
+                actual bet: {p2["MiseActuelle"]}
+                State: {p2["Statut"]}
 
-        - Nom: {p5["Nom"]}
-            Stack: {p5["Stack"]}
-            Statut: {p5["Statut"]}""")
-  
-    flop, turn, river = recognize_all_board_cards() 
-    print(f"""Pot: {pots["Pots"]}
-        Cartes Communes: {flop} {turn} {river}""")
+            - name player3: {p3["Nom"]}
+                bankroll: {p3["Stack"]}
+                actual bet: {p3["MiseActuelle"]}
+                State: {p3["Statut"]}
 
-    actionsPossible = reconnaitreActionsPossible()
-    print(f"""\nactions possible : {actionsPossible}""")
-    
-    finalRequest = f"""
-        Players:
-            My bankroll: {p1["Stack"]}
-            Mes Cartes: {p1["Cartes"]}
-            Ma Mise Actuelle: {p1["MiseActuelle"]}
-            Mon Statut: {p1["Statut"]}
+            - name player4: {p4["Nom"]}
+                bankroll: {p4["Stack"]}
+                actual bet: {p4["MiseActuelle"]}
+                State: {p4["Statut"]}
 
-        - Nom: {p2["Nom"]}
-            Stack: {p2["Stack"]}
-            Statut: {p2["Statut"]}
+            - name player5: {p5["Nom"]}
+                bankroll: {p5["Stack"]}
+                actual bet: {p5["MiseActuelle"]}
+                State: {p5["Statut"]}
 
-        - Nom: {p3["Nom"]}
-            Stack: {p3["Stack"]}
-            Statut: {p3["Statut"]}
-
-        - Nom: {p4["Nom"]}
-            Stack: {p4["Stack"]}
-            Statut: {p4["Statut"]}
-
-        - Nom: {p5["Nom"]}
-            Stack: {p5["Stack"]}
-            Statut: {p5["Statut"]}
-        Pot: {pots["Pots"]}
-        Cartes Communes: {flop} {turn} {river}
-        actions possible : {actionsPossible}
-    """ 
-    return finalRequest
-  
-
-
-def envoyerAGPT(nomPage):
-    questionGPT = remplirJSON()
-    #questionGPT = remplirJSONsimplifie()
-    pyperclip.copy(str(questionGPT))
-    try:
-      fenetreGPT = gw.getWindowsWithTitle(nomPage)
-      if fenetreGPT:
-        fenetreGPT = fenetreGPT[0]
-        pyautogui.click(x=1200, y=950) #-40  # Coordonnées du champ d'entrée
-        time.sleep(0.1)
-        pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
-        time.sleep(0.1)
-        pyautogui.press('enter')  # Appuyer sur la touche Entrée
-        del fenetreGPT
-    except Exception as e:
-        print(f"Erreur lors de l'activation de la fenêtre: {e}")
-        return
-    gc.collect()
-    #fenetre[0].minimize()
+            Pot: {pots["Pots"]}
+            Community Cards: flop: {flop} turn: {turn} river: {river}
+            Moves I can do: {actionsPossible}
+            Money I can bet: 2.225BB, 2.5BB, 2.75BB, 3BB, 3.5BB, 4BB
+        """
+        
+        return finalRequest
+      
+# def envoyerAGPT(nomPage):
+#     #questionGPT = remplirJSON()
+#     #questionGPT = remplirJSONsimplifie()
+#     pyperclip.copy(str(questionGPT))
+#     try:
+#       fenetreGPT = gw.getWindowsWithTitle(nomPage)
+#       if fenetreGPT:
+#         fenetreGPT = fenetreGPT[0]
+#         pyautogui.click(x=1200, y=950) #-40  # Coordonnées du champ d'entrée
+#         time.sleep(0.1)
+#         pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
+#         time.sleep(0.1)
+#         pyautogui.press('enter')  # Appuyer sur la touche Entrée
+#         del fenetreGPT
+#     except Exception as e:
+#         print(f"Erreur lors de l'activation de la fenêtre: {e}")
+#         return
+#     gc.collect()
+#     #fenetre[0].minimize()
     
 # # def envoyerABard(nomPage,screenshot):
     
@@ -742,4 +750,3 @@ def test():
   afficherImage(screenshot_path)
 
 
-#test()

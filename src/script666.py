@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHB
 from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtGui import QFont
 import openai  # Assurez-vous d'importer la bibliothèque openai
-from mesFonctions import *
+from mesFonctions6JoueursW10 import *
 
 class EmittingStream(io.TextIOBase):
     def __init__(self, text_widget):

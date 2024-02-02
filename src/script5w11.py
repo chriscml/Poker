@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHB
 from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtGui import QFont, QPixmap
 import openai  # Assurez-vous d'importer la bibliothèque openai
-from mesFonctions5joueurw11 import *
+from mesFonctions5JoueursW11 import *
 
 class EmittingStream(io.TextIOBase):
     def __init__(self, text_widget):
@@ -95,7 +95,7 @@ class PokerHelperApp(QWidget):
             window_width, window_height = 1800, 900
             self.setGeometry(geometry.x() + 400, geometry.y() + 100, window_width, window_height)
         else:
-            self.setGeometry(100, 100, 1800, 900)
+            self.setGeometry(25, 25, 1700, 900)
 
     @pyqtSlot()
     def execute_functions(self):

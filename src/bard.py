@@ -1,4 +1,4 @@
-from mesFonctions import *
+from mesFonctions6Joueursw10 import *
 
 import sys
 import io
