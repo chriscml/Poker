@@ -7,19 +7,13 @@
 
 Preciser a chat de me dire qu il y a un probleme si il manque une carte dans ma main ou alors de checkk au lieu de fold etc 
 
+6 C1
+9 de coeur trompé C2 reine de coeur au lieu de
+9 flop 3 marche passss
 
-Q flop 1 
-9 flop 1
-8 de ppique c1
-6 trefle c1
-Q c1 
-7 de coeur probleme pas de carte en C1
-7 de trefle pareil
-enlever les lettre inutile dans la stack 
-LES 9 ne marchent pas dutout
-dame carte inconnue premiere carte FIXER CE PTN DE SOUCIS 
+FAIRE PLUE GRND POUR C1 ET GARDER LA PREMIERE LETTRE 
 
 
 
-Bard 
-lui preciser quelle pahse on est pre flop flop turn river pour qu'il comprenne on en est ou 
+
+FAIRE EN SORTE DE NE PAS DIRE DE COMBIEN JE CALL ET JE RAISE TO MAIS JUSTE LES MOTS comme ca il me donne une mise precise 

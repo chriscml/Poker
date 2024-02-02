@@ -93,7 +93,7 @@ def reconnaitreP5Windows10_6():
   dicP5 = {}
   nomP5 =  reconnaitreTxt(screenshot_path,1238,616,1238+200,616+30,"nomP5")
   miseActuelleP5 =  reconnaitreBB(screenshot_path,1112,583,1112+140,583+50,"miseActuelleP5") # a faire plus tard !!!!!!!!!!!
-  stackP5 =  reconnaitreBB(screenshot_path,1238,650,1238+200,650+50,"stackP5") 
+  stackP5 =  reconnaitreBB(screenshot_path,1228,648,1230+208,648+50,"stackP5") 
   
   reconnaitreCartes(screenshot_cartes_path_back,1266,534,1266+45+75,534+45,"b5") 
   b5 = matchingBack(f"{screenshot_cartes_path_back}/b5.png")
@@ -120,7 +120,7 @@ def reconnaitreMesDonneesWindows10_6():
   miseActuelleP1 =  reconnaitreBB(screenshot_path,763,660,949,695,"miseActuelleP1")
   stackP1 =  reconnaitreBB(screenshot_path,724,808,970,863,"stackP1")
   
-  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,698,761+55,696+43,"p1c1")  
+  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,758,695,758+58,695+45,"p1c1")  
   p1c2 = reconnaitreCartes(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
   #reconnaitre status si il n'y a aucune carte 
   

@@ -84,7 +84,7 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a professional poker player, skilled in analyzing and calculating the perfect move to make every time it's your turn."},
-                {"role": "user", "content": "Give me the move to do in BOLD and a small explanation for this poker configuration : " + questionGPT}
+                {"role": "user", "content": "Give me the move to do , skip a line. remind me the cards I have in my hand, skip a line. remind me the community cards , skip a line. give me an explanation in one line (less than 20 words)  : " + questionGPT}
             ]
         )
 

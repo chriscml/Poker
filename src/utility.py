@@ -180,7 +180,7 @@ def matchingVide(carte_path, largeur_base=200, hauteur_base=500, method=cv2.TM_C
             meilleure_correspondance = image_nom
             meilleure_score = score
 
-    nom_carte = 'no card' if meilleure_correspondance else "a card"
+    nom_carte = 'no card yet' if meilleure_correspondance else "a card"
     #print("La carte capturée est :", nom_carte)
     return nom_carte
 
@@ -219,7 +219,7 @@ def get_dominant_color(image, k=4):
     elif dominant_color[1] > dominant_color[0] and dominant_color[1] > dominant_color[2]:  # Green dominant
         return ' of clover'  # Clubs
     else:
-        return "no card"
+        return "no card yet"
       
 def reconnaitreBB(screenshot_path, x1, y1, x2, y2, nomCrop="test"):
     image = Image.open(screenshot_path)
@@ -278,14 +278,14 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
     cropped_image = cv2.imread(image_cropped_path)
     couleur_dominante = get_dominant_color(cropped_image)
     
-    if couleur_dominante == 'no card':
-      return 'no card'
+    if couleur_dominante == 'no card yet':
+      return 'no card yet'
   
     # Preprocess the image for better OCR
     preprocessed_image = preprocess_image(cropped_image)
     
     # Configure tesseract to do single character recognition
-    custom_config = r'--oem 3 --psm 10 -c tessedit_char_whitelist=0123456789AJQK10Q9qajk'
+    custom_config = r'--oem 3 --psm 10 -c tessedit_char_whitelist=0123456789AJQK10Q9'
     text = pytesseract.image_to_string(cropped_image, config=custom_config)
     
     if text.strip() == "1" or text.strip() == "11":
@@ -310,7 +310,7 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
     nomCarte = text.strip() + couleur_dominante
     
     if text == "":
-       nomCarte="no card"
+       nomCarte="no card yet"
     
       
     return nomCarte
@@ -319,17 +319,17 @@ def reconnaitreFlop():
   flop=[]
   flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,358,566+99,368+45,"f1")
   f1 = matchingVide(f"{screenshot_cartes_path_flop}/f1.png")
-  if f1 == "no card":
+  if f1 == "no card yet":
     flop1 = f1
   
   flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,358,678+99,368+45,"f2")
   f2 = matchingVide(f"{screenshot_cartes_path_flop}/f2.png")
-  if f2 == "no card":
+  if f2 == "no card yet":
     flop2 = f2
   
   flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,358,790+99,368+45,"f3")
   f3 = matchingVide(f"{screenshot_cartes_path_flop}/f3.png")
-  if f3 == "no card":
+  if f3 == "no card yet":
     flop3 = f3
     
   flop.append(flop1)
@@ -340,14 +340,14 @@ def reconnaitreFlop():
 def reconnaitreTurn():
   turn = reconnaitreCartes(screenshot_cartes_path_turn,898,358,898+101,368+45,"t")
   t = matchingVide(f"{screenshot_cartes_path_turn}/t.png")
-  if t == "no card":
+  if t == "no card yet":
     turn = t
   return turn.strip()
 
 def reconnaitreRiver():
   river = reconnaitreCartes(screenshot_cartes_path_river,1010,358,1010+101,368+45,"r")
   r = matchingVide(f"{screenshot_cartes_path_river}/r.png")
-  if r == "no card":
+  if r == "no card yet":
     river = r
   return river.strip()
 
