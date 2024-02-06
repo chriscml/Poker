@@ -53,13 +53,13 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
                 self.w10joueurs5()
             elif self.flagW11:
                 # Cas pour Windows 11
-                self.w10joueurs6()
+                self.w11joueurs5()
                 
         elif self.flag6joueurs:
             # Cas pour 6 joueurs
             if self.flagW10:
                 # Cas pour Windows 10
-                self.w11joueurs5()
+                self.w10joueurs6()
             elif self.flagW11:
                 # Cas pour Windows 11
                 self.w11joueurs6()
@@ -83,8 +83,8 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
         completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a professional poker player, skilled in analyzing and calculating the perfect move to make every time it's your turn."},
-                {"role": "user", "content": "Give me the move to do , skip a line. remind me the cards I have in my hand, skip a line. remind me the community cards , skip a line. give me an explanation in one line (less than 20 words)  : " + questionGPT}
+                {"role": "system", "content": "You are a professional poker player, skilled in analyzing the whole game and make the perfect move every time it's your turn."},
+                {"role": "user", "content": questionGPT + "Give me the move to do in bold and give me an explanation in one line (less than 20 words) "}
             ]
         )
 

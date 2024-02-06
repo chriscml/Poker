@@ -141,7 +141,7 @@ def matchingBack(carte_path, largeur_base=200, hauteur_base=500, method=cv2.TM_C
             meilleure_correspondance = image_nom
             meilleure_score = score
 
-    nom_carte = meilleure_correspondance.split('.')[0] if meilleure_correspondance else "couché"
+    nom_carte = meilleure_correspondance.split('.')[0] if meilleure_correspondance else "fold"
     #print("La carte capturée est :", nom_carte)
     return nom_carte
   
@@ -317,17 +317,17 @@ def reconnaitreCartes(screenshot_cartes_path, x1, y1, x2, y2, nomCrop="test"):
 
 def reconnaitreFlop():
   flop=[]
-  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,358,566+99,368+45,"f1")
+  flop1 = reconnaitreCartes(screenshot_cartes_path_flop,566,353,566+99,358+55,"f1")
   f1 = matchingVide(f"{screenshot_cartes_path_flop}/f1.png")
   if f1 == "no card yet":
     flop1 = f1
   
-  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,358,678+99,368+45,"f2")
+  flop2 = reconnaitreCartes(screenshot_cartes_path_flop,678,353,678+99,358+55,"f2")
   f2 = matchingVide(f"{screenshot_cartes_path_flop}/f2.png")
   if f2 == "no card yet":
     flop2 = f2
   
-  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,790,358,790+99,368+45,"f3")
+  flop3 = reconnaitreCartes(screenshot_cartes_path_flop,785,353,785+103,358+55,"f3")
   f3 = matchingVide(f"{screenshot_cartes_path_flop}/f3.png")
   if f3 == "no card yet":
     flop3 = f3

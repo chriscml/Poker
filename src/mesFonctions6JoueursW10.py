@@ -21,10 +21,10 @@ def reconnaitreP2Windows10_6():
   reconnaitreCartes(screenshot_cartes_path_back,345,624,345+45+75,624+45,"b2") 
   b2 = matchingBack(f"{screenshot_cartes_path_back}/b2.png")
    
-  if b2=="couché":
-    Statut="couché"
+  if b2=="fold":
+    Statut="fold"
   else:
-    Statut = "En jeu"
+    Statut = "In game"
     
   
   nomP2 =  re.sub(regex, "", nomP2)
@@ -45,10 +45,10 @@ def reconnaitreP3Windows10_6():
   reconnaitreCartes(screenshot_cartes_path_back,303,171,302+45+75,171+45,"b3") 
   b3 = matchingBack(f"{screenshot_cartes_path_back}/b3.png")
    
-  if b3=="couché":
-    Statut="couché"
+  if b3=="fold":
+    Statut="fold"
   else:
-    Statut = "En jeu"
+    Statut = "In game"
   
   nomP3 =  re.sub(regex, "", nomP3)
   miseActuelleP3 =  re.sub(regex, "", miseActuelleP3)
@@ -68,10 +68,10 @@ def reconnaitreP4Windows10_6():
   reconnaitreCartes(screenshot_cartes_path_back,768,96,768+45+75,96+45,"b4") 
   b4 = matchingBack(f"{screenshot_cartes_path_back}/b4.png")
    
-  if b4=="couché":
-    Statut="couché"
+  if b4=="fold":
+    Statut="fold"
   else:
-    Statut = "En jeu"
+    Statut = "In game"
   
   nomP4 =  re.sub(regex, "", nomP4)
   miseActuelleP4 =  re.sub(regex, "", miseActuelleP4)
@@ -91,10 +91,10 @@ def reconnaitreP5Windows10_6():
   reconnaitreCartes(screenshot_cartes_path_back,1231,172,1231+45+75,172+45,"b5") 
   b5 = matchingBack(f"{screenshot_cartes_path_back}/b5.png")
    
-  if b5=="couché":
-    Statut="couché"
+  if b5=="fold":
+    Statut="fold"
   else:
-    Statut = "En jeu"
+    Statut = "In game"
   
   nomP5 =  re.sub(regex, "", nomP5)
   miseActuelleP5 =  re.sub(regex, "", miseActuelleP5)
@@ -109,15 +109,15 @@ def reconnaitreP6Windows10_6():
   dicP6 = {}
   nomP6 =  reconnaitreTxt(screenshot_path,1198,703,1410,733,"nomP6")
   miseActuelleP6 =  reconnaitreBB(screenshot_path,1100,635,1200,677,"miseActuelleP6") # a faire plus tard !!!!!!!!!!!
-  stackP6 =  reconnaitreBB(screenshot_path,1211,640,1420,792,"stackP6") 
+  stackP6 =  reconnaitreBB(screenshot_path,1211,735,1420,735+50,"stackP6") 
   
   reconnaitreCartes(screenshot_cartes_path_back,1231,621,1231+45+75,621+45,"b6") 
   b6 = matchingBack(f"{screenshot_cartes_path_back}/b6.png")
   
-  if b6=="couché":
-    Statut="couché"
+  if b6=="fold":
+    Statut="fold"
   else:
-    Statut = "En jeu"
+    Statut = "In game"
   
   nomP6 =  re.sub(regex, "", nomP6)
   miseActuelleP6 =  re.sub(regex, "", miseActuelleP6)
@@ -144,7 +144,7 @@ def reconnaitreMesDonneesWindows10_6():
   stackP1 =  re.sub(regex, "", stackP1)
   stackP1 =  re.sub("BB.*", "BB", stackP1)
   
-  dicP1 = {"Nom" : nomP1, "Stack": stackP1, "Cartes":[p1c1,p1c2], "MiseActuelle": miseActuelleP1, "Statut": "En jeu"}
+  dicP1 = {"Nom" : nomP1, "Stack": stackP1, "Cartes":[p1c1,p1c2], "MiseActuelle": miseActuelleP1, "Statut": "In game"}
   return dicP1
 
 def parallel_recognize_players_data():
@@ -203,7 +203,7 @@ def remplirJSON6joueursW10():
                 bankroll: {p5["Stack"]}
                 actual bet: {p5["MiseActuelle"]}
                 State: {p5["Statut"]}
-            - name player5: {p6["Nom"]}
+            - name player6: {p6["Nom"]}
                 bankroll: {p6["Stack"]}
                 actual bet: {p6["MiseActuelle"]}
                 State: {p6["Statut"]}""") 
@@ -243,7 +243,7 @@ def remplirJSON6joueursW10():
                 actual bet: {p5["MiseActuelle"]}
                 State: {p5["Statut"]}
             
-            - name player5: {p6["Nom"]}
+            - name player6: {p6["Nom"]}
                 bankroll: {p6["Stack"]}
                 actual bet: {p6["MiseActuelle"]}
                 State: {p6["Statut"]}
