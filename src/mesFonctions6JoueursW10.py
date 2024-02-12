@@ -135,8 +135,8 @@ def reconnaitreMesDonneesWindows10_6():
   miseActuelleP1 =  reconnaitreBB(screenshot_path,763,660,949,695,"miseActuelleP1")
   stackP1 =  reconnaitreBB(screenshot_path,724,808,970,863,"stackP1")
   
-  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,768,694,761+55,696+45,"p1c1")  
-  p1c2 = reconnaitreCartes(screenshot_cartes_path_c,808,695,808+75,695+45,"p1c2") 
+  p1c1 = reconnaitreCartes(screenshot_cartes_path_c,763,684,763+60,684+60,"p1c1")  
+  p1c2 = reconnaitreCartes(screenshot_cartes_path_c,805,684,805+80,684+60,"p1c2") 
   #reconnaitre status si il n'y a aucune carte 
   
   nomP1 =  re.sub(regex, "", nomP1)
@@ -277,4 +277,5 @@ def test():
   
   print(reconnaitreActionsPossible())
   afficherImage(screenshot_path)
+
 

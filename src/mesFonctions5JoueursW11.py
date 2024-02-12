@@ -336,37 +336,7 @@ def minimiserVSCode(nomPage):
   gc.collect()
 
 
-def screenshot(nomPage, screenshot_path):
-  #minimiserVSCode(nomPageVSCODE)
-  try:
-      # Recherche de la fenêtre "Playground" par son titre
-      fenetre = gw.getWindowsWithTitle(nomPage)
-      if fenetre:
-          fenetre = fenetre[0]
-          fenetre.restore()
-          fenetre.maximize()
-          
-          #left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
 
-          # Attends un court instant pour que la fenêtre apparaisse
-          time.sleep(0.5)
-
-          # Prend une capture d'écran de la fenêtre maximisée
-          screenshot = pyautogui.screenshot() #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
-          screenshot.save(screenshot_path)
-          print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
-          fenetre.minimize()
-          
-
-          # Minimise la fenêtre
-          # fenetre.minimize()
-      else:
-          print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
-
-  except Exception as e:
-      print(f"Erreur lors de la capture d'écran : {e}") 
-    
-  gc.collect()
 
         
 def screenshotWin(nomPage, screenshot_path):

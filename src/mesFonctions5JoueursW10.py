@@ -232,24 +232,7 @@ def remplirJSON5joueursW10():
         
         return finalRequest
 
-def envoyerAGPT(nomPage):
-    questionGPT = remplirJSON()
-    #questionGPT = remplirJSONsimplifie()
-    pyperclip.copy(str(questionGPT))
-    try:
-      fenetreGPT = gw.getWindowsWithTitle(nomPage)
-      if fenetreGPT:
-        fenetreGPT = fenetreGPT[0]
-        pyautogui.click(x=1200, y=950) #-40  # Coordonnées du champ d'entrée
-        time.sleep(0.1)
-        pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
-        time.sleep(0.1)
-        pyautogui.press('enter')  # Appuyer sur la touche Entrée
-        del fenetreGPT
-    except Exception as e:
-        print(f"Erreur lors de l'activation de la fenêtre: {e}")
-        return
-    gc.collect()
+
     #fenetre[0].minimize()
     
 def test():

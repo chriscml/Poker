@@ -77,19 +77,33 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
     
     def api_GPT(self, fct):
         questionGPT = fct()
+        content = "Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure mise possible. Lorsque le joueur a la possibilité de checker, je ne suggérerai pas de fold, à moins que cela ne soit stratégiquement justifié dans des situations très spécifiques. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis pour les couleurs. 3. Fournir une explication très succincte, limitée à 30 mots maximum, expliquant pourquoi cette action est suggérée, prenant en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet et que la bankroll du joueur est conséquente, je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie, y compris la bankroll des joueurs par rapport à leur mise, pour évaluer la probabilité d'un bluff et la stratégie globale. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie."
 
-        client = openai.OpenAI(api_key="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")
+        client = openai.OpenAI(api_key="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")
 
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-0125-preview",
             messages=[
-                {"role": "system", "content": "You are a professional poker player, skilled in analyzing the whole game and make the perfect move every time it's your turn."},
-                {"role": "user", "content": questionGPT + "Give me the move to do in bold and give me an explanation in one line (less than 20 words) "}
+                {"role": "system", "content": content},
+                {"role": "user", "content": questionGPT + " ton role est le suivant : Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure mise possible. Lorsque le joueur a la possibilité de checker, je ne suggérerai pas de fold, à moins que cela ne soit stratégiquement justifié dans des situations très spécifiques. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis colorés pour les couleurs uniquement. 3. Fournir une explication très succincte, limitée à 30 mots maximum, expliquant pourquoi cette action est suggérée, prenant en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet et que la bankroll du joueur est conséquente, je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie, y compris la bankroll des joueurs par rapport à leur mise, pour évaluer la probabilité d'un bluff et la stratégie globale. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie." }
             ]
         )
 
         reponse = completion.choices[0].message.content
         return reponse 
+
+    def format_text(self, text):
+        # Définir le texte formaté
+        formatted_text = ""
+        # Utiliser une expression régulière pour détecter le texte entre **texte**
+        pattern = re.compile(r'\*\*(.*?)\*\*')
+        # Trouver toutes les occurrences de texte entre **texte**
+        matches = pattern.findall(text)
+        # Remplacer les occurrences par du texte en gras
+        for match in matches:
+            text = text.replace(f"**{match}**", f"<b>{match}</b>")
+        # Ajouter le texte formaté à la zone de texte
+        self.text_edit.append(formatted_text)
             
     def w10joueurs5(self):
         screenshot(nomPage,screenshot_path)
@@ -99,8 +113,10 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
         self.progressBar.setValue(25)
         
         reponse = self.api_GPT(remplirJSON5joueursW10)
+        #envoyerAGPT(nomPageChatGPT,remplirJSON5joueursW10)
         
         self.textReponse.insertPlainText(reponse)
+        
         self.progressBar.setValue(100)
         
     def w10joueurs6(self):
@@ -109,6 +125,7 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
         sys.stdout = EmittingStream(self.textQuestion)
         
         reponse = self.api_GPT(remplirJSON6joueursW10)
+        #envoyerAGPT(nomPageChatGPT,remplirJSON6joueursW10)
         
         self.textReponse.insertPlainText(reponse)
         
@@ -116,9 +133,9 @@ class PokerHelperApp(QMainWindow, Ui_MainWindow):
         screenshot(nomPage,screenshot_path)
         self.afficherImageUI()
         
-        reponse = self.api_GPT(remplirJSON5joueursW11)
+        # reponse = self.api_GPT(remplirJSON5joueursW11)
         
-        self.textReponse.insertPlainText(reponse)
+        # self.textReponse.insertPlainText(reponse)
         
     def w11joueurs6(self):
         screenshot(nomPage,screenshot_path)

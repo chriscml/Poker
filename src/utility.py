@@ -96,7 +96,7 @@ def preprocess_image(image):
     # Optional: Apply morphological operations here if there's noise
 
     # Scaling the image to improve recognition
-    scale_percent = 150  # percent of original size
+    scale_percent = 130  # percent of original size
     width = int(binary.shape[1] * scale_percent / 100)
     height = int(binary.shape[0] * scale_percent / 100)
     dim = (width, height)
@@ -418,6 +418,61 @@ def binarize_image(image, threshold=128):
     image = image.point(lambda p: p > threshold and 255)
 
     return image
+
+def envoyerAGPT(nomPage,fct):
+    questionGPT = fct()
+    #questionGPT = remplirJSONsimplifie()
+    pyperclip.copy(str(questionGPT))
+    try:
+      fenetreGPT = gw.getWindowsWithTitle(nomPage)
+      if fenetreGPT:
+        fenetreGPT = fenetreGPT[0]
+        fenetreGPT.restore()
+        time.sleep(0.2)
+        fenetreGPT.maximize()
+        time.sleep(0.3)
+        pyautogui.click(x=1400, y=965) #-40  # Coordonnées du champ d'entrée
+        time.sleep(0.1)
+        pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
+        time.sleep(0.1)
+        pyautogui.press('enter')  # Appuyer sur la touche Entrée
+        del fenetreGPT
+    except Exception as e:
+        print(f"Erreur lors de l'activation de la fenêtre: {e}")
+        return
+    gc.collect()
+
+def screenshot(nomPage, screenshot_path):
+  #minimiserVSCode(nomPageVSCODE)
+  try:
+      # Recherche de la fenêtre "Playground" par son titre
+      fenetre = gw.getWindowsWithTitle(nomPage)
+      if fenetre:
+          fenetre = fenetre[0]
+          fenetre.restore()
+          fenetre.maximize()
+          
+          #left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
+
+          # Attends un court instant pour que la fenêtre apparaisse
+          time.sleep(0.5)
+
+          # Prend une capture d'écran de la fenêtre maximisée
+          screenshot = pyautogui.screenshot() #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
+          screenshot.save(screenshot_path)
+          print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
+          #fenetre.minimize()
+          
+
+          # Minimise la fenêtre
+          # fenetre.minimize()
+      else:
+          print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
+
+  except Exception as e:
+      print(f"Erreur lors de la capture d'écran : {e}") 
+    
+  gc.collect()
 
 
 
