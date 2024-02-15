@@ -9,6 +9,7 @@ import re
 import pyperclip
 import numpy as np
 import os
+import win32gui as gw
 
 from pywinauto.application import Application
 import pyautogui
@@ -70,6 +71,7 @@ regexBlindes =r'[^0-9,€-]'
 nomPageChatGPT = "ChatGPT - Google Chrome"
 nomPageConseilDePokerEnDirect ="Conseils de poker en direct - Google Chrome"
 nomPageVSCODE = "script.py - poker - Visual Studio Code"
+nomPageProgramme="My App"
 
 baseImageBack = "../matching/card/back"
 baseImageVide = "../matching/card/vide"
@@ -452,17 +454,20 @@ def screenshot(nomPage, screenshot_path):
           fenetre.restore()
           fenetre.maximize()
           
-          #left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
-
+          left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
+          top = top + 115
+          width = width - 300
+          height = height - 130
           # Attends un court instant pour que la fenêtre apparaisse
-          time.sleep(0.5)
+          time.sleep(1)
 
           # Prend une capture d'écran de la fenêtre maximisée
-          screenshot = pyautogui.screenshot() #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
+          screenshot = pyautogui.screenshot(region=(left, top, width+2, height+2)) #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
           screenshot.save(screenshot_path)
           print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
-          #fenetre.minimize()
-          
+          fenetre.minimize()
+          cropImage(screenshot_path,732,574,894,740,"mescartes")
+          cropImage(screenshot_path,540,260,1104,428,"cartescommunes")
 
           # Minimise la fenêtre
           # fenetre.minimize()
@@ -473,6 +478,46 @@ def screenshot(nomPage, screenshot_path):
       print(f"Erreur lors de la capture d'écran : {e}") 
     
   gc.collect()
+
+
+def cropImage(screenshot_path, x1, y1, x2, y2, nomCrop="pseudo"):
+    image = Image.open(screenshot_path)
+
+    cropped_image = image.crop((x1, y1, x2, y2))
+    
+    # Save the cropped image for debugging
+    cropped_image.save(f"../assets/{nomCrop}.png")
+
+
+def ecranJoli(nomPageProgramme, nomPage):
+    # Récupérer les fenêtres par leur titre
+    fenetre1 = gw.getWindowsWithTitle(nomPage)
+    fenetre2 = gw.getWindowsWithTitle(nomPageProgramme)
+    
+    fenetre1 = fenetre1[0]
+    fenetre2 = fenetre2[0]
+    
+    if fenetre1 and fenetre2:
+        fenetre2.restore()
+        fenetre2.maximize()
+        pyautogui.hotkey('winleft', 'left')
+        fenetre1.restore()
+        fenetre1.maximize()
+        pyautogui.hotkey('winleft', 'right')
+        
+def deplacerFenetre(nomPage,cote):
+    # Récupérer les fenêtres par leur titre
+    fenetre = gw.getWindowsWithTitle(nomPage)
+    
+    fenetre = fenetre[0]
+    
+    if fenetre:
+        fenetre.restore()
+        fenetre.maximize()
+        pyautogui.hotkey('winleft', cote)
+        
+
+
 
 
 
