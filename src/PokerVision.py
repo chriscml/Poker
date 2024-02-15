@@ -30,8 +30,11 @@ class APITask(QRunnable):
         with open("../assets/cartescommunes.png", "rb") as image_file:
             base64_imageCartesCommunes = base64.b64encode(image_file.read()).decode('utf-8')
         
+        with open("../assets/actionspossibles.png", "rb") as image_file:
+            base64_imageActions = base64.b64encode(image_file.read()).decode('utf-8')
         
-        client = openai.OpenAI(api_key="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")
+        
+        client = openai.OpenAI(api_key="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")
 
         completion = client.chat.completions.create(
             model="gpt-4-vision-preview",
@@ -40,7 +43,7 @@ class APITask(QRunnable):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "réponds en utilisant ton instructions avec ces 3 images. La premiere est la partie totale, la deuxieme image est mes cartes et la troisieme montre les cartes communes s'il y en a"},
+                        {"type": "text", "text": "réponds en utilisant ton instructions avec ces 4 images. La premiere est la partie entiere, la deuxieme image est mes cartes et la troisieme montre les cartes communes s'il y en a et la 4 eme mes actions possibles"},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -59,7 +62,14 @@ class APITask(QRunnable):
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_imageCartesCommunes}",
-                                "detail":"high"
+                                "detail":"high" #essayer sans
+                            },
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_imageActions}",
+                                "detail":"high" #essayer sans
                             },
                         },
                         

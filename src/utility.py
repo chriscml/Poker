@@ -468,6 +468,7 @@ def screenshot(nomPage, screenshot_path):
           fenetre.minimize()
           cropImage(screenshot_path,732,574,894,740,"mescartes")
           cropImage(screenshot_path,540,260,1104,428,"cartescommunes")
+          cropImage(screenshot_path,421,761,1214,910,"actionspossibles")
 
           # Minimise la fenêtre
           # fenetre.minimize()
