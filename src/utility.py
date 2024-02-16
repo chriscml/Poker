@@ -456,7 +456,7 @@ def screenshot(nomPage, screenshot_path):
           
           left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
           top = top + 115
-          width = width - 300
+          #width = width - 300
           height = height - 130
           # Attends un court instant pour que la fenêtre apparaisse
           time.sleep(1)
@@ -465,7 +465,9 @@ def screenshot(nomPage, screenshot_path):
           screenshot = pyautogui.screenshot(region=(left, top, width+2, height+2)) #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
           screenshot.save(screenshot_path)
           print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
-          fenetre.minimize()
+          
+          #fenetre.minimize()
+          
           cropImage(screenshot_path,732,574,894,740,"mescartes")
           cropImage(screenshot_path,540,260,1104,428,"cartescommunes")
           cropImage(screenshot_path,421,761,1214,910,"actionspossibles")

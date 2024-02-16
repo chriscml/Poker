@@ -34,24 +34,17 @@ class APITask(QRunnable):
             base64_imageActions = base64.b64encode(image_file.read()).decode('utf-8')
         
         
-        client = openai.OpenAI(api_key="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")
+        client = openai.OpenAI(api_key="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")
 
         completion = client.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=[
-                {"role": "system", "content": "Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure mise possible. Lorsque le joueur a la possibilité de checker, je ne suggérerai pas de fold, à moins que cela ne soit stratégiquement justifié dans des situations très spécifiques. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis uniquement pour les couleurs. 3. Fournir une explication très succincte, limitée à 30 mots maximum, expliquant pourquoi cette action est suggérée, prenant en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet et que la bankroll du joueur est conséquente, je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie, y compris la bankroll des joueurs par rapport à leur mise, pour évaluer la probabilité d'un bluff et la stratégie globale. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie. Pour m'aider dans l'analyse d'image et plus précisément la coueleur des cartes, si la carte est verte c'est du trefle, bleu c'est du carreaux, rouge c'est du coeur et noir c'est du pique"},
+                {"role": "system", "content": "Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure action et mise possible à jouer comme si j'étais proffesionnel au poker. Lorsque le joueur peux check, je ne suggérerai pas de fold. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis simple uniquement pour les couleurs. 3. Fournir une explication très succincte, limitée à 50 mots maximum, expliquant pourquoi cette action est suggérée. Je prendrai en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet , je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie. Pour m'aider dans l'analyse d'image et plus précisément la coueleur des cartes, si la carte est verte c'est du trefle, bleu c'est du carreaux, rouge c'est du coeur et noir c'est du pique"},
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "réponds en utilisant ton instructions avec ces 4 images. La premiere est la partie entiere, la deuxieme image est mes cartes et la troisieme montre les cartes communes s'il y en a et la 4 eme mes actions possibles"},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}",
-                                "detail":"high"
-                            },
-                        },
-                        {
+                        {"type": "text", "text": "réponds en utilisant ton instructions avec ces 4 images qui decrivent toute la partie de poker. LA derniere est mes actions possible donc ne me dis pas de check qsi je peux pas "},
+                                                {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_imageMesCartes}",
@@ -65,6 +58,14 @@ class APITask(QRunnable):
                                 "detail":"high" #essayer sans
                             },
                         },
+                        
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}",
+                                "detail":"high"
+                            },
+                        },
                         {
                             "type": "image_url",
                             "image_url": {
@@ -72,7 +73,7 @@ class APITask(QRunnable):
                                 "detail":"high" #essayer sans
                             },
                         },
-                        
+
                     ],
                 }
             ],
@@ -114,7 +115,11 @@ class MyApp(QWidget):
         self.text_edit.clear() 
         screenshot(nomPage, screenshot_path)
         self.afficherImageUI(screenshot_path)
-        ecranJoli(nomPageProgramme, nomPage)
+        
+        if len(self.screens) > 1:
+            pass
+        else:
+            ecranJoli(nomPageProgramme, nomPage)
 
         self.threadpool = QThreadPool()
         task = APITask(image_path=screenshot_path)
@@ -125,9 +130,9 @@ class MyApp(QWidget):
         self.text_edit.append(response)
 
     def adjustSizeAndPosition(self):
-        screens = QApplication.screens()
-        if len(screens) > 1:
-            second_screen = screens[1]
+        self.screens = QApplication.screens()
+        if len(self.screens) > 1:
+            second_screen = self.screens[1]
             geometry = second_screen.geometry()
             window_width, window_height = 1800, 900
             self.setGeometry(geometry.x() + 25, geometry.y() + 100, window_width, window_height)
