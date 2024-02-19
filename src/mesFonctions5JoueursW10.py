@@ -231,6 +231,43 @@ def remplirJSON5joueursW10():
         """
         
         return finalRequest
+  
+def remplirJSON5joueursW10VISION():
+      # Redirigez les sorties print vers la zone de texte
+      pots, p1, p2, p3, p4, p5 = parallel_recognize_players_data()
+      
+      finalRequest = f"""
+          Joueurs:
+          - My Name: {p1["Nom"]}
+              My bankroll: {p1["Stack"]}
+              My State: {p1["Statut"]}
+
+          - name player2: {p2["Nom"]}
+              bankroll: {p2["Stack"]}
+              actual bet: {p2["MiseActuelle"]}
+              State: {p2["Statut"]}
+
+          - name player3: {p3["Nom"]}
+              bankroll: {p3["Stack"]}
+              actual bet: {p3["MiseActuelle"]}
+              State: {p3["Statut"]}
+
+          - name player4: {p4["Nom"]}
+              bankroll: {p4["Stack"]}
+              actual bet: {p4["MiseActuelle"]}
+              State: {p4["Statut"]}
+
+          - name player5: {p5["Nom"]}
+              bankroll: {p5["Stack"]}
+              actual bet: {p5["MiseActuelle"]}
+              State: {p5["Statut"]}
+
+          Pot: {pots["Pots"]}
+          
+      """
+      print(finalRequest)
+      
+      return finalRequest
 
 
     #fenetre[0].minimize()

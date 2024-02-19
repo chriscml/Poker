@@ -34,28 +34,42 @@ class APITask(QRunnable):
             base64_imageActions = base64.b64encode(image_file.read()).decode('utf-8')
         
         
-        client = openai.OpenAI(api_key="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")
+        client = openai.OpenAI(api_key="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")
+        
+        instruction= """
+            Je suis As du Poker, un expert en analyse de poker, conçu pour jouer avec la précision du joueur le plus intelligent du monde. Je base mes conseils sur les meilleures probabilités, en analysant minutieusement chaque aspect de la partie : vos cartes, les cartes communes, la dynamique de jeu, et les actions possibles. Mon objectif est de fournir l'action optimale en toute situation, en mettant l'accent sur des stratégies gagnantes à long terme. Je respecte le format de réponse spécifié, en rappelant vos cartes et les cartes communes avec des emojis uniquement pour la couleur, et je fournis une explication concise pour chaque conseil donné.
+
+            1) **ACTION A JOUER + MISE SI BESOIN, EN GRAS**
+
+            2) mes cartes : rappel de vos cartes avec des emojis pour la couleur.
+
+            3) rappel des cartes communes de la même manière.
+
+            4) courte explication de maximum 50 mots de l'action conseillée. 
+        """
+        
+        instruction2 = """Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure action et mise possible à jouer comme si j'étais proffesionnel au poker. Lorsque le joueur peux check, je ne suggérerai pas de FOLD. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis simple uniquement pour les couleurs. 3. Fournir une explication très succincte, limitée à 50 mots maximum, expliquant pourquoi cette action est suggérée. Je prendrai en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet , je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie. Pour m'aider dans l'analyse d'image et plus précisément la coueleur des cartes, si la carte est verte c'est du trefle, bleu c'est du carreaux, rouge c'est du coeur et noir c'est du pique"""
 
         completion = client.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=[
-                {"role": "system", "content": "Je suis **Analyste de Poker Pro**, spécialisé dans l'analyse des parties de Texas Hold'em pour des tables de 5 ou 6 joueurs. Ma méthode consiste à : 1. Présenter l'action recommandée en gras, incluant la meilleure action et mise possible à jouer comme si j'étais proffesionnel au poker. Lorsque le joueur peux check, je ne suggérerai pas de fold. 2. Rappeler brièvement la main du joueur et les cartes communes, en utilisant des emojis simple uniquement pour les couleurs. 3. Fournir une explication très succincte, limitée à 50 mots maximum, expliquant pourquoi cette action est suggérée. Je prendrai en compte le bluff, les probabilités, et en jouant de manière sûre. Si la situation le permet , je peux recommander des mises plus audacieuses pour bluffer. Si la description de la configuration de la partie est incomplète ou manquante, je signalerai le problème en demandant des précisions avant de suggérer une action. Je tiendrai également compte de toutes les informations de la partie. Cela inclut l'analyse des comportements de mise en fonction de la taille de la bankroll, en supposant qu'un joueur avec une petite bankroll misant gros est moins susceptible de bluffer. Mon objectif est de fournir des conseils dignes d'un professionnel, optimisant les probabilités et les meilleures actions tout en prenant en compte le bluff du joueur et des adversaires ainsi que toutes les nuances stratégiques de la partie. Pour m'aider dans l'analyse d'image et plus précisément la coueleur des cartes, si la carte est verte c'est du trefle, bleu c'est du carreaux, rouge c'est du coeur et noir c'est du pique"},
+                {"role": "system", "content": instruction2},
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "réponds en utilisant ton instructions avec ces 4 images qui decrivent toute la partie de poker. LA derniere est mes actions possible donc ne me dis pas de check qsi je peux pas "},
+                        {"type": "text", "text": "ne me dis pas de check si je ne peux pas check. Analyse les images suivante : mes cartes, les cartes communes, le jeu complet, mes actions possible. Si tu vois des cartes de dos au dessus du nom des joueurs c'est qu'ils sont couché "},
                                                 {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_imageMesCartes}",
-                                "detail":"high"
+                                "detail":"high",
                             },
                         },
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_imageCartesCommunes}",
-                                "detail":"high" #essayer sans
+                                "detail":"high",
                             },
                         },
                         
@@ -63,14 +77,14 @@ class APITask(QRunnable):
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_image}",
-                                "detail":"high"
+                                "detail":"high",
                             },
                         },
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{base64_imageActions}",
-                                "detail":"high" #essayer sans
+                                "detail":"high",
                             },
                         },
 
@@ -113,7 +127,7 @@ class MyApp(QWidget):
 
     def execute_script(self):
         self.text_edit.clear() 
-        screenshot(nomPage, screenshot_path)
+        screenshot_vision(nomPage, screenshot_path)
         self.afficherImageUI(screenshot_path)
         
         if len(self.screens) > 1:

@@ -55,6 +55,7 @@ import gc
 nomPage = "Playground"
 
 screenshot_path = "../assets/capture.png"
+screenshot_vision = "../assets/captureVision.png"
 screenshot_pathGPT = "../assets/capture2.png"
 
 
@@ -70,6 +71,7 @@ regexBlindes =r'[^0-9,€-]'
 
 nomPageChatGPT = "ChatGPT - Google Chrome"
 nomPageConseilDePokerEnDirect ="Conseils de poker en direct - Google Chrome"
+nomPageExpert ="ChatGPT - As du Poker - Google Chrome"
 nomPageVSCODE = "script.py - poker - Visual Studio Code"
 nomPageProgramme="My App"
 
@@ -433,7 +435,7 @@ def envoyerAGPT(nomPage,fct):
         time.sleep(0.2)
         fenetreGPT.maximize()
         time.sleep(0.3)
-        pyautogui.click(x=1400, y=965) #-40  # Coordonnées du champ d'entrée
+        pyautogui.click(x=1300, y=982) 
         time.sleep(0.1)
         pyautogui.hotkey('ctrl', 'v')  # Coller le contenu de questionGPT
         time.sleep(0.1)
@@ -444,7 +446,7 @@ def envoyerAGPT(nomPage,fct):
         return
     gc.collect()
 
-def screenshot(nomPage, screenshot_path):
+def screenshot_vision(nomPage, screenshot_path_vision):
   #minimiserVSCode(nomPageVSCODE)
   try:
       # Recherche de la fenêtre "Playground" par son titre
@@ -455,22 +457,22 @@ def screenshot(nomPage, screenshot_path):
           fenetre.maximize()
           
           left, top, width, height = fenetre.left, fenetre.top, fenetre.width, fenetre.height
-          top = top + 115
-          #width = width - 300
+          top = top + 100
+          width = width - 300
           height = height - 130
           # Attends un court instant pour que la fenêtre apparaisse
           time.sleep(1)
 
           # Prend une capture d'écran de la fenêtre maximisée
           screenshot = pyautogui.screenshot(region=(left, top, width+2, height+2)) #region=(left, top, width+2, height+2) +2 pour windows 11 1938 1058
-          screenshot.save(screenshot_path)
-          print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
+          screenshot.save(screenshot_path_vision)
+          print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path_vision}")
           
           #fenetre.minimize()
           
-          cropImage(screenshot_path,732,574,894,740,"mescartes")
-          cropImage(screenshot_path,540,260,1104,428,"cartescommunes")
-          cropImage(screenshot_path,421,761,1214,910,"actionspossibles")
+          cropImage(screenshot_path_vision,781,574,1002,779,"mescartes")
+          cropImage(screenshot_path_vision,540,260,1104,428,"cartescommunes")
+          cropImage(screenshot_path_vision,450,784,1278,928,"actionspossibles")
 
           # Minimise la fenêtre
           # fenetre.minimize()
@@ -481,6 +483,34 @@ def screenshot(nomPage, screenshot_path):
       print(f"Erreur lors de la capture d'écran : {e}") 
     
   gc.collect()
+
+def screenshot(nomPage, screenshot_path):
+    #minimiserVSCode(nomPageVSCODE)
+    try:
+        # Recherche de la fenêtre "Playground" par son titre
+        fenetre = gw.getWindowsWithTitle(nomPage)
+        if fenetre:
+            fenetre = fenetre[0]
+            fenetre.restore()
+            fenetre.maximize()
+            time.sleep(1)
+
+            # Prend une capture d'écran de la fenêtre maximisée
+            screenshot = pyautogui.screenshot()
+            screenshot.save(screenshot_path)
+            print(f"Capture d'écran de l'onglet enregistrée sous : {screenshot_path}")
+            
+            #fenetre.minimize()
+        else:
+            print(f"L'onglet '{nomPage}' n'a pas été trouvé.")
+        
+    except Exception as e:
+        print(f"Erreur lors de la capture d'écran : {e}") 
+      
+    cropImage(screenshot_path,765,687,954,892,"mescartes")
+    cropImage(screenshot_path,566,360,1158,528,"cartescommunes")
+    cropImage(screenshot_path,430,884,1520,1026,"actionspossibles")  
+    gc.collect()
 
 
 def cropImage(screenshot_path, x1, y1, x2, y2, nomCrop="pseudo"):
